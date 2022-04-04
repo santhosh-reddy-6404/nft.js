@@ -1,2 +1,3 @@
-# nft.js
-A Javascript library to implement NFTs
+**NFT.JS - A Javascript library to implement NFTs**
+
+Visit : https://nftjs.netlify.app/
