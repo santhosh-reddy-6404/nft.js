@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta charset="UTF-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
+  <meta name="viewport" content="width=device-width, user-scalable=no"/>
+  
+  <link rel="stylesheet" href="/assets/style.css"></link>
+  
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/logo.png">
+  
+  <title>NFT.js - NFT mininting library</title>
+
+  <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+  
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+ 
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  
+  <script src='https://unpkg.com/react-router-dom@5.0.0/umd/react-router-dom.min.js'></script>
+  
+  <script src="/assets/fontawesome.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+
+  <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
+  
+  <script src="/assets/script.js"></script>
+  
+  <script src="/nft.js"></script>
+  
+</head>
+
+<body>
+  
+<div id="loader"></div>
+  
+<div id="app"></div>
+
+<script type="text/babel">// Start...
+
+const Router = ReactRouterDOM.HashRouter;
+const Switch = ReactRouterDOM.Switch;
+const Link = ReactRouterDOM.Link;
+const Route = ReactRouterDOM.Route;
+
+const { useState } = React
+const { useEffect } = React
+
+// App Component...
+
+const App = () => {
+
+//Authentication...
+
+const [log, setLog] = useState(false)
+
+var user;
+const [balance, setBal] = useState('0')
+
+Moralis.start({ serverUrl, appId });
+if(Moralis.User.current()){
+user = Moralis.User.current().get('ethAddress');
+useEffect(() => {
+if(user !== null) {
+setLog(true)
+web3.eth.getBalance(user).then(async(bal)=> { setBal((web3.utils.fromWei(bal, 'ether').toString().substr(0, 7)) )
+})
+}
+}, [log])
+} else {
+var user="null"
+}
+
+function LogIn() {
+  Moralis.start({ serverUrl, appId });
+  if(window.ethereum) {
+  Moralis.authenticate({signingMessage:"hello!"}).then(function (user) {
+  window.location.reload()
+  setLog(true)
+  })
+  } else {alert("You don't have metamask installed on your browser! Unable to login...")}
+}
+
+function profLog() {
+  if(confirm("You need to login to trade SUN. Click 'ok' to login...")===true) {
+    LogIn()
+  }
+}
+
+//Header...
+
+const Header = () => {
+
+return (<div className="header">
+
+<header>
+  <img src="/images/logo.png"></img>
+  <logo>NFT.JS</logo>
+</header>
+
+</div>)}
+
+//Home...
+
+const Home = () => {
+
+return(<div><div className="page">
+
+<div className="banner">
+  <img src="/images/banner.png"/>
+  <div className="text">
+  <h1>NFT.JS - An Ultimate Javascript Library to implement NFTs</h1>
+  <div className="buttons">
+    <button><a href="https://santhoshreddy.hashnode.dev/nftjs-a-javascript-library-to-implement-nfts">Learn more!</a></button>
+    <button><Link to="/test">Test it!</Link></button>
+  </div>
+  </div>
+</div>
+
+<h3>Why use NFTJS ?</h3>
+
+<div className="BOXES">
+  <div className="box">
+    <i className="fas fa-code"/><br/><br/>
+    <b>Low Code</b><br/>
+    <p>NFTJS removes the usage of Solidity to create ERC721 smart contract and Web3.JS to interact with the contract</p>
+  </div>
+  <div className="box">
+    <i className="fas fa-server"/><br/><br/>
+    <b>Integrated IPFS</b><br/>
+    <p>You don't need another IPFS provider. NFTJS is integrated with an IPFS gateway (provided by Moralis)</p>
+  </div>
+  <div className="box">
+    <i className="fas fa-rocket-launch"/><br/><br/>
+    <b>Easy to Implement</b><br/>
+    <p>NFTJS is very easy to get started just by importing a script file and the usage is super cool & easy!</p>
+  </div>
+</div>
+
+<h3>How to get started ?</h3>
+
+<div className="BOX">
+  <p>Copy and paste the given code in the HEAD section of your index.html file to get started with NFT.JS. Read the <b><a href="">docs</a></b> to know the usage</p>
+  <input type="text" value='<script src="https://nftjs.netlify.app/nft.js" type="text/javascript" />'/>
+</div>
+
+<h3>Developed By</h3>
+
+<div className="BOX">
+  <div className="prof">
+    <img src="/images/dev.png"/><br/>
+    <b><a className="name" href="https://santhoshreddy.hashnode.dev">Santhosh Reddy</a></b>
+  </div>
+  <span>👋 Hello world! This is Santhosh a web and blockchain dev. I developed NFT.JS to make implementation of NFTs easy for my fellow web3 devs. Feel free to contact me via <b><a href="https://twitter.com/santhosh6404">twitter</a></b></span>
+</div>
+
+</div>
+<footer>
+<p>Made with 💛 by <a href="https://santhoshreddy.hashnode.dev">Santhosh Reddy</a> </p>
+</footer>
+
+</div>)}
+
+//Test...
+
+const Test = () => {
+
+var collection;
+
+NFTJS.start("rinkeby", user);
+
+return (<div className="page">{log?<div>
+
+<div className="profile">
+<div className="user">
+  <img src="/images/profile.png" width="50px" height="50px"/>
+  <div className="det">
+    <p><span>Address : </span>{user.substr(0,5)+'....'+user.substr(-5)}</p>
+    <p><span>ETH Balance : </span>{balance+' '}<i class="fab fa-ethereum"></i></p>
+  </div>
+</div>
+</div>
+
+<div className="functions">
+
+  <b>NFTJS - A Javascript NFT library</b>
+  <a>The utilities of NFT.js includes deploying the contract of a NFT collection and interacting with the contract.</a><br/><br/>
+  <a>Using NFT.js diminishes the work of solidity to write a ERC721 smart contract, IPFS to store the metadata as well as files in the metadata, web3.js/ethers.js to interact with the contract.</a><br/><br/>
+  <a>So, consider using NFT.js to build your scalable NFT marketplaces, Social media and other Dapps that requires implementation of NFTs</a><br/><br/>
+  <a>This is just a work-around to test the library or manually do the actions. To learn more about NFT.js read the <b><a href="https://santhoshreddy.hashnode.dev/nftjs-a-javascript-library-to-implement-nfts">docs</a></b> for how-to usage, benefits and implementations</a><br/><br/>
+  
+  <b>Initialize NFTJS</b>
+  <a>(you are the user)</a>
+  <div className="func">
+    <button onClick={async() => {
+    var network = document.getElementById("network").value
+    NFTJS.start(network, user)
+    }}>setNFTJS</button>
+    <div className="inputs">
+    <input id="network" type="text" placeholder="network (mainnet/rinkeby/ropsten)"/>
+    </div>
+  </div>
+
+  <b>Deploy a collection contract.</b>
+  <a>• Deploy a NFT collection contract...</a>
+  <div className="func">
+    <button onClick={async() => {
+    var name = document.getElementById("name").value
+    var symbol = document.getElementById("symbol").value
+    var mintable = document.getElementById("mintable").value
+    var msupply = document.getElementById("msupply").value
+    await NFTJS.createCollection(name, symbol, mintable, msupply)
+    NFTJSdeployed = NFTJSdeployed
+    }}>Deploy</button>
+    <div className="inputs">
+    <input id="name" type="text" placeholder="name"/>
+    <input id="symbol" type="text" placeholder="symbol"/>
+    <input id="mintable" type="text" placeholder="publicMintable"/>
+    <input id="msupply" type="number" placeholder="maxSupply"/>
+    </div>
+  </div>
+  
+  <a>• get address of recently deployed contract</a>
+  <div className="func">
+    <button onClick={async() => {
+    document.getElementById("addrsss").value = NFTJS.deployed()
+    }}>getContract</button>
+    <div className="inputs">
+    <input id="addrsss" type="text" placeholder="address"/>
+    </div>
+  </div>
+  
+  <b>Interact with a collection contract.</b>
+  
+  <a>• Set the collection</a>
+  <div className="func">
+    <button onClick={async() => {
+    collection = new NFTJS.collection(document.getElementById("Caddrs").value)
+    }}>setCollection</button>
+    <div className="inputs">
+    <input id="Caddrs" type="text" placeholder="address"/>
+    </div>
+  </div>
+  
+  <br/><br/>
+  <a>• Mint a NFT...(you are the minter)</a>
+  <div className="func">
+    <button onClick={async() => {
+    var name = document.getElementById("namen").value
+    var des = document.getElementById("des").value
+    var img = document.getElementById("img").files[0]
+    alert("please wait for 15 seconds, untill the data has been stored in IPFS. Wait until you see a prompt in metamask")
+    await collection.mint({
+      "name" : name,
+      "description" : des,
+      "image" : img
+    })
+    }}>Mint</button>
+    <div className="inputs">
+    <input id="namen" type="text" placeholder="name"/>
+    <input id="des" type="text" placeholder="description"/>
+    <input id="img" type="file" placeholder="image"/>
+    </div>
+  </div>
+  
+  <a>• LazyMintAndTransfer a NFT... (you are the buyer)</a>
+  <div className="func">
+    <button onClick={async() => {
+    var minter = document.getElementById("minter").value
+    var price = document.getElementById("price").value
+    var name = document.getElementById("namen2").value
+    var des = document.getElementById("des2").value
+    var img = document.getElementById("img2").files[0]
+    alert("please wait for 15 seconds, untill the data has been stored in IPFS. Wait until you see a prompt in metamask")
+    await collection.lazyMintAndTransfer(minter, price,{
+      "name" : name,
+      "description" : des,
+      "image" : img
+    })
+    }}>lazyMint</button>
+    <div className="inputs">
+    <input id="minter" type="text" placeholder="minter"/>
+    <input id="price" type="number" placeholder="price (eth)"/>
+    <input id="namen2" type="text" placeholder="name"/>
+    <input id="des2" type="text" placeholder="description"/>
+    <input id="img2" type="file" placeholder="image"/>
+    </div>
+  </div>
+  
+  <a>• update a NFT metadata...(you are the owner)</a>
+  <div className="func">
+    <button onClick={async() => {
+    var id = document.getElementById("id3").value
+    var name = document.getElementById("namen3").value
+    var des = document.getElementById("des3").value
+    var img = document.getElementById("img3").files[0]
+    alert("please wait for 15 seconds, untill the data has been stored in IPFS. Wait until you see a prompt in metamask")
+    await collection.updateNFT(id, {
+      "name" : name,
+      "description" : des,
+      "image" : img
+    })
+    }}>update</button>
+    <div className="inputs">
+    <input id="id3" type="number" placeholder="id"/>
+    <input id="namen3" type="text" placeholder="name"/>
+    <input id="des3" type="text" placeholder="description"/>
+    <input id="img3" type="file" placeholder="image"/>
+    </div>
+  </div>
+  
+  <a>• Burn a NFT... (you are the owner)</a>
+  <div className="func">
+    <button onClick={async() => {
+    var id = document.getElementById("id4").value
+    await collection.burnNFT(id)
+    }}>burn</button>
+    <div className="inputs">
+    <input id="id4" type="text" placeholder="id"/>
+    </div>
+  </div>
+  
+  <a>• Give approval of a NFT to the contract... (you are the owner)</a>
+  <div className="func">
+    <button onClick={async() => {
+    var id = document.getElementById("id").value
+    await collection.approve(id)
+    }}>approve</button>
+    <div className="inputs">
+    <input id="id" type="text" placeholder="id"/>
+    </div>
+  </div>
+  
+  <a>• Give approval of all your NFTs to the contract... (you are the owner)</a>
+  <div className="func">
+    <button onClick={async() => {
+    var bool = document.getElementById("bool").value
+    await collection.setApprovalForAll(bool)
+    }}>setApproveAll</button>
+    <div className="inputs">
+    <input id="bool" type="text" placeholder="bool"/>
+    </div>
+  </div>
+  
+  <a>• transfer from "from" to the "to"... ("to" will recieve the NFT and "from" will recieve the ETH (price))</a>
+  <div className="func">
+    <button onClick={async() => {
+    var price = document.getElementById("price2").value
+    var from = document.getElementById("from").value
+    var to = document.getElementById("to2").value
+    var id = document.getElementById("id12").value
+    await collection.transferFrom(from, to, price, id)
+    }}>transferFrom</button>
+    <div className="inputs">
+    <input id="price2" type="text" placeholder="price (eth)"/>
+    <input id="from" type="text" placeholder="from"/>
+    <input id="to2" type="text" placeholder="to"/>
+    <input id="id12" type="text" placeholder="id"/>
+    </div>
+  </div>
+  
+  <a>• transfer to the "to"... (you are the owner)</a>
+  <div className="func">
+    <button onClick={async() => {
+    var to = document.getElementById("to").value
+    var id = document.getElementById("id2").value
+    await collection.transfer(to, id)
+    }}>transfer</button>
+    <div className="inputs">
+    <input id="to" type="text" placeholder="to"/>
+    <input id="id2" type="text" placeholder="id"/>
+    </div>
+  </div>
+  
+  <a>• Collection details... </a>
+  <div className="func" id="calls">
+    <button onClick={async() => {
+      var a = await collection.details()
+      alert(JSON.stringify(a))
+    }}>Details</button>
+  </div>
+  
+  <a>• getApproved of a NFT... </a>
+  <div className="func">
+    <button onClick={async() => {
+    var id = document.getElementById("id9").value
+    alert(await collection.getApproved(id))
+    }}>getApproved</button>
+    <div className="inputs">
+    <input id="id9" type="number" placeholder="id"/>
+    </div>
+  </div>
+  
+  <a>• get isApprovedForAll of a NFT... </a>
+  <div id="calls" className="func">
+    <button onClick={async() => {
+    alert(await collection.isApprovedForAll())
+    }}>isApprovedAll</button>
+  </div>
+  
+  <a>• NFT metadata... </a>
+  <div className="func">
+    <button onClick={async() => {
+    var id = document.getElementById("id5").value
+    var a = await collection.tokenData(id)
+    alert(JSON.stringify(a))
+    }}>tokenData</button>
+    <div className="inputs">
+    <input id="id5" type="number" placeholder="id"/>
+    </div>
+  </div>
+  
+  <a>• ownerOf a NFT... </a>
+  <div className="func">
+    <button onClick={async() => {
+    var id = document.getElementById("id6").value
+    alert(await collection.ownerOf(id))
+    }}>ownerOf</button>
+    <div className="inputs">
+    <input id="id6" type="number" placeholder="id"/>
+    </div>
+  </div>
+  
+  <a>• balanceOf a address... </a>
+  <div className = "func" >
+    <button onClick={async() => {
+    var addr1 = document.getElementById("addr").value
+    var a = await collection.balanceOf(addr1)
+    alert(a)
+    }}>balanceOf</button>
+    <div className = "inputs" >
+    <input id="addr" type="text" placeholder="address"/>
+    </div> 
+    
+  </div>
+  
+</div>
+
+</div>
+:<button onClick={LogIn} className="login">Connect Wallet</button>}
+
+</div>)}
+
+//Routing...
+
+return(<Router><Header/>
+
+<div className="main"><Switch>
+
+<Route exact path="/"><Home/></Route>
+<Route exact path="/test"><Test/></Route>
+
+</Switch></div>
+
+</Router>)}
+
+//End
+
+ReactDOM.render(<App/>, document.getElementById('app'))
+
+</script>
+
+</body>
+
+</html>
