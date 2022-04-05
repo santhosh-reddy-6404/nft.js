@@ -56,6 +56,11 @@ body {
   margin: 15px;
 }
 
+#ph {
+  width: 250px;
+  height: 54px;
+}
+
 /* header */
 
 .header {
