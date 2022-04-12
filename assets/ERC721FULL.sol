@@ -14,8 +14,6 @@ contract NFTjs is ERC721URIStorage, Ownable {
 
   bool internal openMintable;
 
-  address internal admin;
-
   uint internal maxSupply;
   
   mapping(string => uint) existingURIs;
@@ -24,13 +22,12 @@ contract NFTjs is ERC721URIStorage, Ownable {
 
   constructor(string memory name, string memory symbol, bool mintable, uint mSupply) ERC721(name, symbol) { 
     openMintable = mintable;
-    admin = msg.sender;
     maxSupply = mSupply;
   }
 
   modifier onlyAllowed(address sender) {
   if(openMintable == false) {
-  require(sender == admin, "only admin can mint");
+  require(sender == owner(), "only admin can mint");
   }
   _;
   }
@@ -66,15 +63,15 @@ contract NFTjs is ERC721URIStorage, Ownable {
     require(existingURIs[tokenURI] != 1, "NFT already minted");
     _safeMint(buyer, newItemId);
     _setTokenURI(newItemId, tokenURI);
-    payable(minter).transfer(msg.value);
     emit lazyMintedAndTransferred(minter, buyer, tokenIds.current());
-  }
+    payable(minter).transfer(msg.value);
+ }
 
-  function transferFromTo(address from, address to, uint id) external payable {
+  function buyTransfer(address from, address to, uint id) external payable {
     require(getApproved(id) == address(this), "ERC721: caller is not owner or approved");
     require(msg.value > 0, "must send some ether");
+    address(this).call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256,bytes)", from, to, id,""));
     payable(from).transfer(msg.value);
-    address(this).call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256)", from, to, id));
   }
 
   function totalSupply() public view returns (uint) {
