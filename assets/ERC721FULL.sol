@@ -71,9 +71,10 @@ contract NFTjs is ERC721URIStorage, Ownable {
   }
 
   function transferFromTo(address from, address to, uint id) external payable {
+    require(getApproved(id) == address(this), "ERC721: caller is not owner or approved");
     require(msg.value > 0, "must send some ether");
-    safeTransferFrom(from, to, id);
     payable(from).transfer(msg.value);
+    address(this).call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256)", from, to, id));
   }
 
   function totalSupply() public view returns (uint) {
