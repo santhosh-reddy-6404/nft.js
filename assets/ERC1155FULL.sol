@@ -56,7 +56,7 @@ contract NFTJS is ERC1155, Ownable {
     tokens[id].supply = tokens[id].supply.add(amount);
   }
 
-  function lazyMint(address minter, address buyer, uint id, uint amount) external payable onlyAllowed(minter) {
+  function lazyMint(address minter, address buyer, uint id, uint amount) external payable correctId(id) onlyAllowed(minter) {
     require(msg.value > 0, "must send some ether");
     require(amount.add(tokens[id].supply) <= tokens[id].maxSupply, "maximum supply reached!");
     _mint(buyer, id, amount, "");
