@@ -91,7 +91,7 @@ contract NFTJS is ERC1155, Ownable {
     tokens[id] = token(msg.sender, _uri, tokens[id].supply, _maxSupply);
   }
 
-  function getCreator(uint id) public view returns(address) {
+  function getCreator(uint id) public correctId(id) view returns(address) {
     return tokens[id].creator;
   }
 
@@ -99,11 +99,11 @@ contract NFTJS is ERC1155, Ownable {
     return tokens[id].uri;
   }
 
-  function tokenSupply(uint id) public view returns(uint) {
+  function tokenSupply(uint id) public correctId(id) view returns(uint) {
     return tokens[id].supply;
   }
 
-  function tokenMaxSupply(uint id) public view returns(uint) {
+  function tokenMaxSupply(uint id) public correctId(id) view returns(uint) {
     return tokens[id].maxSupply;
   }
 
