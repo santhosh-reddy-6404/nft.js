@@ -73,7 +73,7 @@ contract NFTJS is ERC1155, Ownable {
     emit lazyMinted(minter, buyer, id, amount);
     uint value1 = (msg.value).mul(100-transferCharge).div(100);
     uint value2 = (msg.value).mul(transferCharge).div(100);
-    payable(from).transfer(value1);
+    payable(minter).transfer(value1);
     payable(admin).transfer(value2);
   }
 
@@ -101,7 +101,7 @@ contract NFTJS is ERC1155, Ownable {
     _mint(msg.sender, id, initialSupply, "");
   }
 
-  function updateToken(uint id, string memory _uri, uint _maxSupply, _fee) external correctId(id) {
+  function updateToken(uint id, string memory _uri, uint _maxSupply, uint _fee) external correctId(id) {
     require(msg.sender == tokens[id].creator, "only the creator can update the token");
     tokens[id] = token(msg.sender, _uri, tokens[id].supply, _maxSupply, _fee);
   }
@@ -120,6 +120,10 @@ contract NFTJS is ERC1155, Ownable {
 
   function tokenMaxSupply(uint id) public correctId(id) view returns(uint) {
     return tokens[id].maxSupply;
+  }
+
+  function tokenFee(uint id) public correctId(id) view returns(uint) {
+    return tokens[id].fee;
   }
 
   function totalSupply() public view returns(uint) {
