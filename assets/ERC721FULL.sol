@@ -87,6 +87,10 @@ contract NFTjs is ERC721URIStorage, Ownable {
     return tokenIds.current();
   }
 
+  function balance() public view returns (uint) {
+    return address(this).balance;
+  }
+
   function withdraw(uint _amount) external onlyOwner {
     payable(owner()).transfer(_amount);
   }
