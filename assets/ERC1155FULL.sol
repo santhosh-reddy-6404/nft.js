@@ -134,4 +134,12 @@ contract NFTJS is ERC1155, Ownable {
     return openMintable;
   }
 
+  function balance() public view returns (uint) {
+    return address(this).balance;
+  }
+
+  function withdraw(uint _amount) external onlyOwner {
+    payable(owner()).transfer(_amount);
+  }
+
 }
