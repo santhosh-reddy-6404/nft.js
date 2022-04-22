@@ -40,7 +40,7 @@ contract NFTjs is ERC721URIStorage, Ownable {
   }
   
   function mintNFT(address minter, string memory tokenURI) public payable onlyAllowed(msg.sender) returns (uint) { 
-    require(msg.value = mintFee*(10**18), "send the exact mintFee");
+    require(msg.value == mintFee.mul(10**18), "send the exact mintFee");
     tokenIds.increment();
     uint256 newItemId = tokenIds.current();
     require(newItemId <= maxSupply, "maximum supply reached");
@@ -58,7 +58,8 @@ contract NFTjs is ERC721URIStorage, Ownable {
     _burn(id);
   }
 
-  function lazyMintAndTransfer(address minter, address buyer, string memory tokenURI) onlyAllowed(minter)  payable external {
+  function lazyMintAndTransfer(address minter, address buyer, string memory tokenURI) external payable onlyAllowed(minter) {
+    require(mintFee == 0, "lazyMint is not supported for this contract");
     require(msg.value > 0, "must send some ether");
     tokenIds.increment();
     uint256 newItemId = tokenIds.current();
@@ -66,14 +67,20 @@ contract NFTjs is ERC721URIStorage, Ownable {
     _safeMint(buyer, newItemId);
     _setTokenURI(newItemId, tokenURI);
     emit lazyMintedAndTransferred(minter, buyer, tokenIds.current());
-    payable(minter).transfer(msg.value);
+    uint value1 = (msg.value).mul(100-transferCharge).div(100);
+    uint value2 = (msg.value).mul(transferCharge).div(100);
+    payable(from).transfer(value1);
+    payable(admin).transfer(value2);
  }
 
   function buyTransfer(address from, address to, uint id) external payable {
     require(getApproved(id) == address(this), "ERC721: caller is not owner or approved");
     require(msg.value > 0, "must send some ether");
+    uint value1 = (msg.value).mul(100-transferCharge).div(100);
+    uint value2 = (msg.value).mul(transferCharge).div(100);
     address(this).call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256,bytes)", from, to, id,""));
-    payable(from).transfer(msg.value);
+    payable(from).transfer(value1);
+    payable(admin).transfer(value2);
   }
 
   function totalSupply() public view returns (uint) {
