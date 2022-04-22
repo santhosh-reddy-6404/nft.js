@@ -16,11 +16,20 @@ contract NFTjs is ERC721URIStorage, Ownable {
 
   uint public maxSupply;
 
+  address public admin;
+
+  uint public mintFee;
+
+  uint public tranferCharge;
+
   event lazyMintedAndTransferred(address minter, address buyer, uint tokenId);
 
-  constructor(string memory name, string memory symbol, bool mintable, uint mSupply) ERC721(name, symbol) { 
+  constructor(string memory name, string memory symbol, bool mintable, uint mSupply, address _admin, uint _mintFee, uint _transferCharge) ERC721(name, symbol) { 
     publicMintable = mintable;
     maxSupply = mSupply;
+    admin = _admin;
+    mintFee = _mintFee;
+    transferCharge = _transferCharge;
   }
 
   modifier onlyAllowed(address sender) {
@@ -30,20 +39,18 @@ contract NFTjs is ERC721URIStorage, Ownable {
   _;
   }
   
-  function mintNFT(address minter, string memory tokenURI) public onlyAllowed(msg.sender) returns (uint) { 
+  function mintNFT(address minter, string memory tokenURI) public payable onlyAllowed(msg.sender) returns (uint) { 
+    require(msg.value = mintFee*(10**18), "send the exact mintFee");
     tokenIds.increment();
     uint256 newItemId = tokenIds.current();
     require(newItemId <= maxSupply, "maximum supply reached");
     _safeMint(minter, newItemId);
     _setTokenURI(newItemId, tokenURI);
-    existingURIs[tokenURI] = 1;
-    return newItemId;
   }
 
   function updateNFT(uint id, string memory url) external {
     require(msg.sender == ownerOf(id));
     _setTokenURI(id, url);
-    existingURIs[url] = 1;
   }
 
   function burnNFT(uint id) external {
@@ -71,6 +78,10 @@ contract NFTjs is ERC721URIStorage, Ownable {
 
   function totalSupply() public view returns (uint) {
     return tokenIds.current();
+  }
+
+  function withdraw(uint _amount) external onlyOwner {
+    payable(owner()).transfer(_amount);
   }
 
 }
