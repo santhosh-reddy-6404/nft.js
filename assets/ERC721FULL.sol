@@ -12,21 +12,19 @@ contract NFTjs is ERC721URIStorage, Ownable {
   
   Counters.Counter private tokenIds;
 
-  bool internal openMintable;
+  bool public publicMintable;
 
-  uint internal maxSupply;
-  
-  mapping(string => uint) existingURIs;
+  uint public maxSupply;
 
   event lazyMintedAndTransferred(address minter, address buyer, uint tokenId);
 
   constructor(string memory name, string memory symbol, bool mintable, uint mSupply) ERC721(name, symbol) { 
-    openMintable = mintable;
+    publicMintable = mintable;
     maxSupply = mSupply;
   }
 
   modifier onlyAllowed(address sender) {
-  if(openMintable == false) {
+  if(publicMintable == false) {
   require(sender == owner(), "only admin can mint");
   }
   _;
@@ -36,7 +34,6 @@ contract NFTjs is ERC721URIStorage, Ownable {
     tokenIds.increment();
     uint256 newItemId = tokenIds.current();
     require(newItemId <= maxSupply, "maximum supply reached");
-    require(existingURIs[tokenURI] != 1, "NFT already minted");
     _safeMint(minter, newItemId);
     _setTokenURI(newItemId, tokenURI);
     existingURIs[tokenURI] = 1;
@@ -45,7 +42,6 @@ contract NFTjs is ERC721URIStorage, Ownable {
 
   function updateNFT(uint id, string memory url) external {
     require(msg.sender == ownerOf(id));
-    require(existingURIs[url] != 1, "NFT already minted");
     _setTokenURI(id, url);
     existingURIs[url] = 1;
   }
@@ -60,7 +56,6 @@ contract NFTjs is ERC721URIStorage, Ownable {
     tokenIds.increment();
     uint256 newItemId = tokenIds.current();
     require(newItemId <= maxSupply, "maximum supply reached");
-    require(existingURIs[tokenURI] != 1, "NFT already minted");
     _safeMint(buyer, newItemId);
     _setTokenURI(newItemId, tokenURI);
     emit lazyMintedAndTransferred(minter, buyer, tokenIds.current());
@@ -76,14 +71,6 @@ contract NFTjs is ERC721URIStorage, Ownable {
 
   function totalSupply() public view returns (uint) {
     return tokenIds.current();
-  }
-
-  function maximumSupply() public view returns(uint) {
-    return maxSupply;
-  }
-
-  function publicMintable() public view returns(bool) {
-    return openMintable;
   }
 
 }
