@@ -58,7 +58,7 @@ contract NFTJS is ERC1155, Ownable {
   }
 
   function mint(uint id, uint amount) external payable correctId(id) onlyAllowed(msg.sender) {
-    require(msg.value == tokens[id].fee, "send the exact mintFee");
+    require((msg.value).div(10**18) == (tokens[id].fee).mul(amount), "send the exact mintFee");
     require(amount.add(tokens[id].supply) <= tokens[id].maxSupply, "maximum supply reached!");
     _mint(msg.sender, id, amount, "");
     tokens[id].supply = tokens[id].supply.add(amount);
@@ -106,7 +106,7 @@ contract NFTJS is ERC1155, Ownable {
     tokens[id] = token(msg.sender, _uri, tokens[id].supply, _maxSupply, _fee);
   }
 
-  function getCreator(uint id) public correctId(id) view returns(address) {
+  function tokenCreator(uint id) public correctId(id) view returns(address) {
     return tokens[id].creator;
   }
 
@@ -122,7 +122,7 @@ contract NFTJS is ERC1155, Ownable {
     return tokens[id].maxSupply;
   }
 
-  function tokenFee(uint id) public correctId(id) view returns(uint) {
+  function tokenFee(uint id) public correctId(id) view returns(uint) { 
     return tokens[id].fee;
   }
 
