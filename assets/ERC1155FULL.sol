@@ -14,6 +14,7 @@ contract NFTJS is ERC1155, Ownable {
     string uri;
     uint supply;
     uint maxSupply;
+    uint fee;
   }
 
   mapping(uint => token) internal tokens;
@@ -25,13 +26,19 @@ contract NFTJS is ERC1155, Ownable {
   uint internal tokenIds;
 
   bool internal openMintable;
+  
+  address public admin;
+
+  uint public transferCharge;
 
   event lazyMinted(address minter, address buyer, uint tokenId, uint amount);
 
-  constructor(string memory _name, string memory _symbol, string memory uri, bool _openMintable) ERC1155(uri) {
+  constructor(string memory _name, string memory _symbol, string memory uri, bool _openMintable, address _admin, uint _transferCharge) ERC1155(uri) {
     name = _name;
     symbol = _symbol;
     openMintable = _openMintable;
+    admin = _admin;
+    transferCharge = _transferCharge;
   }
 
   modifier onlyAllowed(address sender) {
@@ -50,19 +57,24 @@ contract NFTJS is ERC1155, Ownable {
     _setURI(uri);
   }
 
-  function mint(uint id, uint amount) external correctId(id) onlyAllowed(msg.sender) {
+  function mint(uint id, uint amount) external payable correctId(id) onlyAllowed(msg.sender) {
+    require(msg.value == tokens[id].fee, "send the exact mintFee");
     require(amount.add(tokens[id].supply) <= tokens[id].maxSupply, "maximum supply reached!");
     _mint(msg.sender, id, amount, "");
     tokens[id].supply = tokens[id].supply.add(amount);
   }
 
   function lazyMint(address minter, address buyer, uint id, uint amount) external payable correctId(id) onlyAllowed(minter) {
+    require(tokens[id].fee == 0, "lazyMint is not supported for this NFT");
     require(msg.value > 0, "must send some ether");
     require(amount.add(tokens[id].supply) <= tokens[id].maxSupply, "maximum supply reached!");
     _mint(buyer, id, amount, "");
     tokens[id].supply = tokens[id].supply.add(amount);
     emit lazyMinted(minter, buyer, id, amount);
-    payable(minter).transfer(msg.value);
+    uint value1 = (msg.value).mul(100-transferCharge).div(100);
+    uint value2 = (msg.value).mul(transferCharge).div(100);
+    payable(from).transfer(value1);
+    payable(admin).transfer(value2);
   }
 
   function burn(uint id, uint amount) external correctId(id) {
@@ -75,20 +87,23 @@ contract NFTJS is ERC1155, Ownable {
     require(amount <= balanceOf(from, id), "insufficient token balance");
     require(msg.value > 0, "must send some ether");
     address(this).call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256,uint256,bytes)", from, to, id,amount,""));
-    payable(from).transfer(msg.value);
+    uint value1 = (msg.value).mul(100-transferCharge).div(100);
+    uint value2 = (msg.value).mul(transferCharge).div(100);
+    payable(from).transfer(value1);
+    payable(admin).transfer(value2);
   }
 
-  function createToken(string memory _uri, uint initialSupply, uint _maxSupply) external onlyOwner {
+  function createToken(string memory _uri, uint initialSupply, uint _maxSupply, uint _fee) external onlyOwner {
     require(initialSupply <= _maxSupply, "maximum supply shouldn't be more than initialSupply");
     uint id = tokenIds.add(1);
-    tokens[id] = token(msg.sender, _uri, initialSupply, _maxSupply);
+    tokens[id] = token(msg.sender, _uri, initialSupply, _maxSupply, _fee);
     tokenIds = tokenIds.add(1);
     _mint(msg.sender, id, initialSupply, "");
   }
 
-  function updateToken(uint id, string memory _uri, uint _maxSupply) external correctId(id) {
+  function updateToken(uint id, string memory _uri, uint _maxSupply, _fee) external correctId(id) {
     require(msg.sender == tokens[id].creator, "only the creator can update the token");
-    tokens[id] = token(msg.sender, _uri, tokens[id].supply, _maxSupply);
+    tokens[id] = token(msg.sender, _uri, tokens[id].supply, _maxSupply, _fee);
   }
 
   function getCreator(uint id) public correctId(id) view returns(address) {
