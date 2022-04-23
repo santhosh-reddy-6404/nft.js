@@ -78,7 +78,8 @@ contract NFTjs is ERC721URIStorage, Ownable {
     require(msg.value > 0, "must send some ether");
     uint value1 = (msg.value).mul(100-transferCharge).div(100);
     uint value2 = (msg.value).mul(transferCharge).div(100);
-    address(this).call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256,bytes)", from, to, id,""));
+    (bool success, ) = address(this).call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256,bytes)", from, to, id,""));
+    require(success, "transfer failed");
     payable(from).transfer(value1);
     payable(admin).transfer(value2);
   }
