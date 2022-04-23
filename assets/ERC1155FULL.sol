@@ -86,7 +86,8 @@ contract NFTJS is ERC1155, Ownable {
     require(isApprovedForAll(from, address(this)), "ERC1155: Contract not approved");
     require(amount <= balanceOf(from, id), "insufficient token balance");
     require(msg.value > 0, "must send some ether");
-    address(this).call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256,uint256,bytes)", from, to, id,amount,""));
+    (bool success, ) = address(this).call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256,uint256,bytes)", from, to, id,amount,""));
+    require(success, "transfer failed");
     uint value1 = (msg.value).mul(100-transferCharge).div(100);
     uint value2 = (msg.value).mul(transferCharge).div(100);
     payable(from).transfer(value1);
