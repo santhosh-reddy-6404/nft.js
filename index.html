@@ -202,26 +202,55 @@ return (<div className="page">{log?<div>
     NFTJS.start(network, user)
     }}>setNFTJS</button>
     <div className="inputs">
-    <input id="network" type="text" placeholder="network (mainnet/rinkeby/ropsten)"/>
+    <input id="network" type="text" placeholder="network (eth/rinkeby, polygon/mumbai, etc.)"/>
     </div>
   </div>
 
-  <b>Deploy a collection contract.</b>
-  <a>• Deploy a NFT collection contract...</a>
+  <b>Deploy collection contracts.</b>
+  <a>• Deploy a ERC721 collection contract...</a>
   <div className="func">
     <button onClick={async() => {
     var name = document.getElementById("name").value
     var symbol = document.getElementById("symbol").value
     var mintable = document.getElementById("mintable").value
     var msupply = document.getElementById("msupply").value
-    await NFTJS.createCollection(name, symbol, mintable, msupply)
-    NFTJSdeployed = NFTJSdeployed
+    var admin = document.getElementById("admin").value
+    var mfee = document.getElementById("mfee").value
+    var tcharge = document.getElementById("tcharge").value
+    await NFTJS.createERC721(name, symbol, mintable, msupply, admin, mfee, tcharge)
     }}>Deploy</button>
     <div className="inputs">
     <input id="name" type="text" placeholder="name"/>
     <input id="symbol" type="text" placeholder="symbol"/>
     <input id="mintable" type="text" placeholder="publicMintable"/>
     <input id="msupply" type="number" placeholder="maxSupply"/>
+    <input id="admin" type="text" placeholder="admin"/>
+    <input id="mfee" type="text" placeholder="mintFee"/>
+    <input id="tcharge" type="number" placeholder="transferCharge"/>
+    </div>
+  </div>
+
+  <a>• Deploy a ERC1155 collection contract...</a>
+  <div className="func">
+    <button onClick={async() => {
+    var name = document.getElementById("name1").value
+    var symbol = document.getElementById("symbol1").value
+    var mintable = document.getElementById("mintable1").value
+    var admin = document.getElementById("admin1").value
+    var tcharge = document.getElementById("tcharge1").value
+    var img = document.getElementById("img").files[0]
+    await NFTJS.createERC1155(name, symbol, mintable, admin, tcharge, {
+      "name":name,
+      "image":img
+    })
+    }}>Deploy</button>
+    <div className="inputs">
+    <input id="name1" type="text" placeholder="name"/>
+    <input id="symbol1" type="text" placeholder="symbol"/>
+    <input id="mintable1" type="text" placeholder="publicMintable"/>
+    <input id="admin1" type="text" placeholder="admin"/>
+    <input id="tcharge1" type="number" placeholder="transferCharge"/>
+    <input id="img" type="file" placeholder="image"/>
     </div>
   </div>
   
