@@ -40,9 +40,9 @@ contract NFTjs is ERC721URIStorage, Ownable {
   }
   
   function mintNFT(address minter, string memory tokenURI) public payable onlyAllowed(msg.sender) { 
-    require(msg.value == mintFee.mul(10**18), "send the exact mintFee");
+    require(msg.value == mintFee, "send the exact mintFee");
     tokenIds = tokenIds.add(1);
-    uint256 newItemId = tokenIds.sub(1);
+    uint256 newItemId = tokenIds.add(1);
     require(newItemId <= maxSupply, "maximum supply reached");
     _safeMint(minter, newItemId);
     _setTokenURI(newItemId, tokenURI);
